@@ -16,12 +16,20 @@ export interface Transaction {
   category: string;
 }
 
+export interface PasswordReset {
+  codeHash: string;
+  expiresAt: number;
+  attempts: number;
+}
+
 export interface UserRecord {
   name: string;
   username: string;
   passHash: string;
   accounts: Account[];
   transactions: Transaction[];
+  /** Present only while a password reset is in flight. */
+  reset?: PasswordReset;
 }
 
 export interface DB {
