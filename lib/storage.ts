@@ -62,6 +62,67 @@ export function authenticate(db: DB, username: string, password: string): { erro
   return {};
 }
 
+const RESET_CODE_TTL_MS = 15 * 60 * 1000;
+const RESET_MAX_ATTEMPTS = 5;
+
+/**
+ * Issues a one-time reset code for `username`.
+ *
+ * This demo has no email delivery, so the code is handed back to the caller and
+ * shown on screen — which also means it confirms whether a username exists. A real
+ * backend would mail the code and always report success, to avoid leaking that.
+ */
+export function requestPasswordReset(
+  db: DB,
+  username: string
+): { error?: string; code?: string } {
+  if (!username) return { error: "Enter your username." };
+  const u = db.users[username];
+  if (!u) return { error: "No account found with that username." };
+
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  u.reset = {
+    codeHash: toyHash(code),
+    expiresAt: Date.now() + RESET_CODE_TTL_MS,
+    attempts: 0,
+  };
+  return { code };
+}
+
+export function resetPassword(
+  db: DB,
+  username: string,
+  code: string,
+  newPassword: string
+): { error?: string } {
+  const u = db.users[username];
+  if (!u || !u.reset) return { error: "Request a reset code first." };
+
+  if (Date.now() > u.reset.expiresAt) {
+    delete u.reset;
+    return { error: "That code has expired. Request a new one." };
+  }
+
+  if (u.reset.codeHash !== toyHash(code.trim())) {
+    u.reset.attempts += 1;
+    if (u.reset.attempts >= RESET_MAX_ATTEMPTS) {
+      delete u.reset;
+      return { error: "Too many incorrect attempts. Request a new code." };
+    }
+    const left = RESET_MAX_ATTEMPTS - u.reset.attempts;
+    return { error: `Incorrect code. ${left} attempt${left === 1 ? "" : "s"} left.` };
+  }
+
+  // Code was correct — a weak new password is rejected without burning the code.
+  if (newPassword.length < 4) return { error: "Password must be at least 4 characters." };
+
+  u.passHash = toyHash(newPassword);
+  delete u.reset;
+  // Force a fresh sign-in if this account happened to be the active session.
+  if (db.session === username) db.session = null;
+  return {};
+}
+
 export function currentUser(db: DB): UserRecord | null {
   return db.session ? db.users[db.session] ?? null : null;
 }
