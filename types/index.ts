@@ -22,6 +22,23 @@ export interface PasswordReset {
   attempts: number;
 }
 
+export type MarketingChannel = "email" | "sms" | "push" | "post";
+export type MarketingTopic = "productNews" | "offers" | "rewards" | "research";
+export type MarketingFrequency = "realtime" | "weekly" | "monthly";
+
+export interface MarketingPreferences {
+  /** Where we're allowed to reach the customer. */
+  channels: Record<MarketingChannel, boolean>;
+  /** What we're allowed to talk about. */
+  topics: Record<MarketingTopic, boolean>;
+  frequency: MarketingFrequency;
+  /** Use this customer's own activity to tailor what they're shown. */
+  personalization: boolean;
+  /** Share with partner brands for their own marketing. */
+  thirdParty: boolean;
+  updatedAt: number;
+}
+
 export interface UserRecord {
   name: string;
   username: string;
@@ -30,6 +47,8 @@ export interface UserRecord {
   transactions: Transaction[];
   /** Present only while a password reset is in flight. */
   reset?: PasswordReset;
+  /** Absent on accounts created before marketing preferences shipped. */
+  marketing?: MarketingPreferences;
 }
 
 export interface DB {
