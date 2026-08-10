@@ -16,6 +16,8 @@ import {
   currentUser,
   loadDB,
   newId,
+  requestPasswordReset,
+  resetPassword,
   saveDB,
 } from "@/lib/storage";
 import { seedDemoTransactions } from "@/mocks/demoTransactions";
@@ -25,6 +27,12 @@ interface BankContextValue {
   user: UserRecord | null;
   login: (username: string, password: string) => { error?: string };
   register: (name: string, username: string, password: string) => { error?: string };
+  requestReset: (username: string) => { error?: string; code?: string };
+  completeReset: (
+    username: string,
+    code: string,
+    newPassword: string
+  ) => { error?: string };
   logout: () => void;
   transfer: (
     fromId: string,
@@ -69,6 +77,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (r.error) return r;
       persist(next);
       return {};
+    },
+    [persist]
+  );
+
+  const requestReset = useCallback(
+    (username: string) => {
+      const next = loadDB();
+      const r = requestPasswordReset(next, username);
+      if (r.error) return r;
+      persist(next);
+      return r;
+    },
+    [persist]
+  );
+
+  const completeReset = useCallback(
+    (username: string, code: string, newPassword: string) => {
+      const next = loadDB();
+      const r = resetPassword(next, username, code, newPassword);
+      // Persist either way: failed attempts increment the attempt counter.
+      persist(next);
+      return r;
     },
     [persist]
   );
@@ -134,8 +164,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [persist]);
 
   const value = useMemo<BankContextValue>(
-    () => ({ ready, user: currentUser(db), login, register, logout, transfer, seedDemo }),
-    [ready, db, login, register, logout, transfer, seedDemo]
+    () => ({
+      ready,
+      user: currentUser(db),
+      login,
+      register,
+      requestReset,
+      completeReset,
+      logout,
+      transfer,
+      seedDemo,
+    }),
+    [ready, db, login, register, requestReset, completeReset, logout, transfer, seedDemo]
   );
 
   return <BankContext.Provider value={value}>{children}</BankContext.Provider>;
