@@ -1,5 +1,40 @@
 import { element } from "@testsigma/code";
 
+export const switchToRegisterLink = element({
+  name: "Create one (switch to register)",
+  locator: { csspath: "[data-testid='switch-to-register']" },
+});
+
+export const registerNameInput = element({
+  name: "Register full name",
+  locator: { csspath: "[data-testid='register-name']" },
+});
+
+export const registerUsernameInput = element({
+  name: "Register username",
+  locator: { csspath: "[data-testid='register-username']" },
+});
+
+export const registerPasswordInput = element({
+  name: "Register password",
+  locator: { csspath: "[data-testid='register-password']" },
+});
+
+export const registerSubmitButton = element({
+  name: "Create account button",
+  locator: { csspath: "[data-testid='register-submit']" },
+});
+
+export const registerErrorBanner = element({
+  name: "Register error banner",
+  locator: { csspath: "[data-testid='register-error']" },
+});
+
+export const signOutButton = element({
+  name: "Sign out button",
+  locator: { csspath: "[data-testid='sign-out']" },
+});
+
 // Login / register card (components/AuthScreen.tsx)
 export const usernameInput = element({
   name: "Username input",
@@ -31,13 +66,8 @@ export const fullNameInput = element({
   locator: { csspath: ".auth-card input[placeholder='Alex Morgan']" },
 });
 
-export const registerUsernameInput = element({
-  name: "Register username input",
-  locator: { csspath: ".auth-card input[placeholder='alex']" },
-});
-
 export const createAccountButton = element({
-  name: "Create account button",
+  name: "Create account button (login flow)",
   locator: { csspath: ".auth-card .btn.btn-primary.btn-block" },
 });
 
@@ -45,9 +75,4 @@ export const createAccountButton = element({
 export const userChip = element({
   name: "User chip",
   locator: { csspath: ".user-chip" },
-});
-
-export const signOutButton = element({
-  name: "Sign out button",
-  locator: { csspath: ".topbar .btn.btn-ghost" },
 });

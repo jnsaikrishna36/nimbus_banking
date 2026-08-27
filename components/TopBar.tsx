@@ -43,6 +43,7 @@ export function TopBar() {
           <div style={{ fontSize: 13 }}>{user.name}</div>
         </div>
         <button
+          data-testid="sign-out"
           className="btn btn-ghost"
           onClick={() => {
             logout();

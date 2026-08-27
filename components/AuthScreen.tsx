@@ -70,33 +70,55 @@ export function AuthScreen() {
               Sign in
             </button>
             <p className="auth-switch">
-              No account? <a onClick={() => setMode("register")}>Create one</a>
+              No account?{" "}
+              <a data-testid="switch-to-register" onClick={() => setMode("register")}>
+                Create one
+              </a>
             </p>
           </div>
         ) : (
           <div>
             <h2 className="auth-title">Create your account</h2>
             <p className="auth-sub">You&apos;ll get a Checking, Savings &amp; Credit account.</p>
-            {regError && <div className="error">{regError}</div>}
+            {regError && (
+              <div className="error" data-testid="register-error">
+                {regError}
+              </div>
+            )}
             {regInfo && <div className="info">{regInfo}</div>}
             <div className="field">
               <label>Full name</label>
-              <input value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Alex Morgan" />
+              <input
+                data-testid="register-name"
+                value={regName}
+                onChange={(e) => setRegName(e.target.value)}
+                placeholder="Alex Morgan"
+              />
             </div>
             <div className="field">
               <label>Username</label>
-              <input value={regUser} onChange={(e) => setRegUser(e.target.value)} placeholder="alex" />
+              <input
+                data-testid="register-username"
+                value={regUser}
+                onChange={(e) => setRegUser(e.target.value)}
+                placeholder="alex"
+              />
             </div>
             <div className="field">
               <label>Password (min 4 chars)</label>
               <input
+                data-testid="register-password"
                 type="password"
                 value={regPass}
                 onChange={(e) => setRegPass(e.target.value)}
                 placeholder="••••••••"
               />
             </div>
-            <button className="btn btn-primary btn-block" onClick={handleRegister}>
+            <button
+              data-testid="register-submit"
+              className="btn btn-primary btn-block"
+              onClick={handleRegister}
+            >
               Create account
             </button>
             <p className="auth-switch">
